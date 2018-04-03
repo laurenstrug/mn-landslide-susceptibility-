@@ -31,6 +31,15 @@ def hillshade(array, azimuth, angle_altitude): # Based on ESRI hillshade
     * np.cos(azimuthrad - aspect)
     return 255*(shaded + 1)/2
 
+def slope(array)
+    x, y = np.gradient(array)
+    slope = np.pi/2. - np.arctan(np.sqrt(x*x + y*y))
+    return slope
+
+def aspect(array)
+    x, y = np.gradient(array)
+    aspect = np.arctan2(-x, y)
+    return acpect
 
 with rasterio.open(file) as src:
     band1 = src.read(1)
