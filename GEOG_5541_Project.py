@@ -45,6 +45,7 @@ def aspect(array)
 with rasterio.open(file) as src:
     band1 = src.read(1)
     
+
 hshade_array = hillshade(band1, 45, 45)
 plt.imshow(hshade_array, cmap = 'Greys')
 plt.show()
