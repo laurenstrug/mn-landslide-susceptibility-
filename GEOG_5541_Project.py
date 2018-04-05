@@ -45,14 +45,17 @@ def aspect(array)
 with rasterio.open(file) as src:
     band1 = src.read(1)
     
-
 hshade_array = hillshade(band1, 45, 45)
 plt.imshow(hshade_array, cmap = 'Greys')
 plt.show()
 
-for filename in folder.glob("*.tif"):
+#empyt 4 geodatabases: one for hillshade45, hillshade315, slope, and aspect
+
+for filename in folder.glob("*.tif"): #Figure out how to loop through geodatabase with tif
     with rasterio.open(filename) as src:
         band1 = src.read(1)
     hillshade(band1, 45, 45)
+    hillshade(band1, 315, 45)
     slope(band1)
     aspect(band1)
+    #Add each function to appropriate geodatabase 
