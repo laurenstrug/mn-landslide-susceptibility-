@@ -3,7 +3,7 @@
 import rasterio
 import numpy as np
 import matplotlib.pyplot as plt
-import glob
+import gdal 
 
 
 file = "Downloads/MN_lidar_tile_-120-114_dem.tif" #Locates file
@@ -32,12 +32,12 @@ def hillshade(array, azimuth, angle_altitude): # Based on ESRI hillshade
     * np.cos(azimuthrad - aspect)
     return 255*(shaded + 1)/2
 
-def slope(array)
+def slope(array):
     x, y = np.gradient(array)
     slope = np.pi/2. - np.arctan(np.sqrt(x*x + y*y))
     return slope
 
-def aspect(array)
+def aspect(array):
     x, y = np.gradient(array)
     aspect = np.arctan2(-x, y)
     return aspect
@@ -50,12 +50,22 @@ plt.imshow(hshade_array, cmap = 'Greys')
 plt.show()
 
 #empyt 4 geodatabases: one for hillshade45, hillshade315, slope, and aspect
+from osgeo import ogr
 
-for filename in folder.glob("*.tif"): #Figure out how to loop through geodatabase with tif
+driver = ogr.GetDriverByName("lidar")
+ds = ogr.driver.Open(r"C:\Users\Lauren\Downloads\Lidar tiles\lidar.gdb", 0)
+
+hillshade45 = []
+hillshade315 = []
+slopelist = []
+aspectlist = []
+
+for filename in ds: #Figure out how to loop through geodatabase with tif
     with rasterio.open(filename) as src:
         band1 = src.read(1)
-    hillshade(band1, 45, 45)
-    hillshade(band1, 315, 45)
-    slope(band1)
-    aspect(band1)
+
+    hillshade45.append(hillshade(band1, 45, 45))
+    hillshade315.append(hillshade(band1, 315, 45))
+    slopelist.append(slope(band1))
+    aspectlist.append(aspect(band1))
     #Add each function to appropriate geodatabase 
