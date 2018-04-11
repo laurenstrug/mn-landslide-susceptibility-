@@ -51,21 +51,43 @@ plt.show()
 
 #empyt 4 geodatabases: one for hillshade45, hillshade315, slope, and aspect
 from osgeo import ogr
+import os 
+import glob
 
-driver = ogr.GetDriverByName("lidar")
-ds = ogr.driver.Open(r"C:\Users\Lauren\Downloads\Lidar tiles\lidar.gdb", 0)
+path = 'C:\\Users\\Lauren\\Downloads\\Lidar tiles'
 
-hillshade45 = []
-hillshade315 = []
-slopelist = []
-aspectlist = []
 
-for filename in ds: #Figure out how to loop through geodatabase with tif
-    with rasterio.open(filename) as src:
+#Below I am commenting out the way we were trying before with .gdb files
+
+#driver = ogr.GetDriverByName("OpenFileGDB")
+#ds = driver.Open(r"C:\Users\Lauren\Downloads\Lidar tiles", 0)
+
+#hillshade45 = ("C:\Users\Lauren\Downloads\Hillshade45.gdb")
+#hillshade315 = ("C:\Users\Lauren\Downloads\Hillshade315.gdb")
+#slopelist = ("C:\Users\Lauren\Downloads\Slopelist.gdb")
+#aspectlist = ("C:\Users\Lauren\Downloads\Aspectlist.gdb")
+
+hillshade45array =[] #Empty arrays to store the output of the loop
+hillshade315array = []
+slopelistarray = []
+aspectlistarray = []
+
+for filename in glob.glob(os.path.join(path, '*.tif')): #Loop through folder
+    with rasterio.open(filename) as src: #Opens tif in folder with rasterio
         band1 = src.read(1)
 
-    hillshade45.append(hillshade(band1, 45, 45))
-    hillshade315.append(hillshade(band1, 315, 45))
-    slopelist.append(slope(band1))
-    aspectlist.append(aspect(band1))
-    #Add each function to appropriate geodatabase 
+    hillshade45array.append(hillshade(band1, 45, 45))#Appends the output of the 
+    hillshade315array.append(hillshade(band1, 315, 45))#function to the appropriate array
+    slopelistarray.append(slope(band1))
+    aspectlistarray.append(aspect(band1))
+    
+    #outhillshade45 = hillshade45 + "_hillshade45.tif" 
+    
+    
+    #Below is a potential way to add each function to appropriate geodatabase 
+    #for i in xrange(10):
+       #with open('file_{0}.dat'.format(i),'w') as f:
+          #f.write(str(func(i)))
+
+print(hillshade45)
+print(hillshade45array)
