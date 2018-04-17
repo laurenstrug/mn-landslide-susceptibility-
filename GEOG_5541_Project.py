@@ -53,6 +53,7 @@ plt.show()
 from osgeo import ogr
 import os 
 import glob
+import gdal 
 
 path = 'C:\\Users\\Lauren\\Downloads\\Lidar tiles'
 
@@ -62,10 +63,10 @@ path = 'C:\\Users\\Lauren\\Downloads\\Lidar tiles'
 #driver = ogr.GetDriverByName("OpenFileGDB")
 #ds = driver.Open(r"C:\Users\Lauren\Downloads\Lidar tiles", 0)
 
-#hillshade45 = ("C:\Users\Lauren\Downloads\Hillshade45.gdb")
-#hillshade315 = ("C:\Users\Lauren\Downloads\Hillshade315.gdb")
-#slopelist = ("C:\Users\Lauren\Downloads\Slopelist.gdb")
-#aspectlist = ("C:\Users\Lauren\Downloads\Aspectlist.gdb")
+#hillshade45folder = ("C:\Users\Lauren\Downloads\Lidar tiles\Hillshade45") #paths to empty folders for new tifs to go
+#hillshade315folder = ("C:\Users\Lauren\Downloads\Lidar tiles\Hillshade315")
+#slopefolder = ("C:\Users\Lauren\Downloads\Lidar tiles\Slope")
+#aspectfolder = ("C:\Users\Lauren\Downloads\Lidar tiles\Aspect")
 
 hillshade45array =[] #Empty arrays to store the output of the loop
 hillshade315array = []
@@ -73,14 +74,22 @@ slopelistarray = []
 aspectlistarray = []
 
 for filename in glob.glob(os.path.join(path, '*.tif')): #Loop through folder
-    with rasterio.open(filename) as src: #Opens tif in folder with rasterio
-        band1 = src.read(1)
-
-    hillshade45array.append(hillshade(band1, 45, 45))#Appends the output of the 
-    hillshade315array.append(hillshade(band1, 315, 45))#function to the appropriate array
-    slopelistarray.append(slope(band1))
-    aspectlistarray.append(aspect(band1))
+    ds = gdal.Open(filename)
+    band = ds.GetRasterBand(1)
+    band1 = band.ReadAsArray()
+    #with rasterio.open(filename) as src: #Opens tif in folder with rasterio
+        #band1 = src.read(1)
     
+    arr_out = hillshade(band1, 45, 45)
+    #hillshade45array.append(hillshade(band1, 45, 45))#Appends the output of the 
+    #hillshade315array.append(hillshade(band1, 315, 45))#function to the appropriate array
+    #slopelistarray.append(slope(band1))
+    #aspectlistarray.append(aspect(band1))
+    
+    driver = gdal.GetDriverByName("GTiff")
+    outdata = driver.create(outfilename, rows, cols, 1)
+    outband = outdata.GetRasterBand(1)
+    outband.WriteArray(arr_out)
     #outhillshade45 = hillshade45 + "_hillshade45.tif" 
     
     
@@ -89,5 +98,5 @@ for filename in glob.glob(os.path.join(path, '*.tif')): #Loop through folder
        #with open('file_{0}.dat'.format(i),'w') as f:
           #f.write(str(func(i)))
 
-print(hillshade45)
+
 print(hillshade45array)
