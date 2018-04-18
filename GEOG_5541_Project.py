@@ -87,10 +87,15 @@ for filename in glob.glob(os.path.join(path, '*.tif')): #Loop through folder
     #aspectlistarray.append(aspect(band1))
     
     driver = gdal.GetDriverByName("GTiff")
-    outdata = driver.create(outfilename, rows, cols, 1)
+    outdata = driver.create(outfilename, rows, cols, 1, gdal.GDT_UInt16)
     outband = outdata.GetRasterBand(1)
+    outdata.SetProjection(ds.GetProjection())#sets same projection as input
     outband.WriteArray(arr_out)
-    #outhillshade45 = hillshade45 + "_hillshade45.tif" 
+    outdata.FlushCache() #saves to disk
+    
+    outdata = None #important to close the files
+    band = None
+    ds = None  
     
     
     #Below is a potential way to add each function to appropriate geodatabase 
