@@ -50,58 +50,40 @@ plt.imshow(hshade_array, cmap = 'Greys')
 plt.show()
 
 #empyt 4 geodatabases: one for hillshade45, hillshade315, slope, and aspect
-from osgeo import ogr
 import os 
 import glob
 import gdal 
 
-path = 'C:\\Users\\Lauren\\Downloads\\Lidar tiles'
+path = 'C:\\Users\\Lauren\\Downloads\\Lidar tiles' #Locates folder with multiple tif files stored in it
 
-
-#Below I am commenting out the way we were trying before with .gdb files
-
-#driver = ogr.GetDriverByName("OpenFileGDB")
-#ds = driver.Open(r"C:\Users\Lauren\Downloads\Lidar tiles", 0)
-
-#hillshade45folder = ("C:\Users\Lauren\Downloads\Lidar tiles\Hillshade45") #paths to empty folders for new tifs to go
-#hillshade315folder = ("C:\Users\Lauren\Downloads\Lidar tiles\Hillshade315")
-#slopefolder = ("C:\Users\Lauren\Downloads\Lidar tiles\Slope")
-#aspectfolder = ("C:\Users\Lauren\Downloads\Lidar tiles\Aspect")
-
-hillshade45array =[] #Empty arrays to store the output of the loop
-hillshade315array = []
-slopelistarray = []
-aspectlistarray = []
-
-for filename in glob.glob(os.path.join(path, '*.tif')): #Loop through folder
-    ds = gdal.Open(filename)
-    band = ds.GetRasterBand(1)
-    band1 = band.ReadAsArray()
-    #with rasterio.open(filename) as src: #Opens tif in folder with rasterio
-        #band1 = src.read(1)
-    
-    arr_out = hillshade(band1, 45, 45)
-    #hillshade45array.append(hillshade(band1, 45, 45))#Appends the output of the 
-    #hillshade315array.append(hillshade(band1, 315, 45))#function to the appropriate array
-    #slopelistarray.append(slope(band1))
-    #aspectlistarray.append(aspect(band1))
-    
+def create_tif(outfilename, arr_out, rows, cols):
     driver = gdal.GetDriverByName("GTiff")
-    outdata = driver.create(outfilename, rows, cols, 1, gdal.GDT_UInt16)
+    outdata = driver.Create(outfilename, rows, cols, 1, gdal.GDT_UInt32)
     outband = outdata.GetRasterBand(1)
     outdata.SetProjection(ds.GetProjection())#sets same projection as input
     outband.WriteArray(arr_out)
     outdata.FlushCache() #saves to disk
+
     
+for filename in glob.glob(os.path.join(path, '*.tif')): #Loop through folder with files ending in .tif
+    ds = gdal.Open(filename) #Open file using gdal
+    band = ds.GetRasterBand(1)
+    band1 = band.ReadAsArray() #Reads band 1 as an array
+
+    shapelist = band1.shape #Gets the size of the array with numpy
+    cols = shapelist[0] #Stores the width of the raster
+    rows = shapelist[1] #stores the height of the raster
+    
+    input_functions = [hillshade(band1, 45, 45), hillshade(band1, 315, 45), slope(band1), aspect(band1)] #List of functions
+    folder = ['hillshade45','hillshade315','slope','aspect'] #List of folders where the output of functions will be stored
+    endings = ['_shd45.tif','_shd315.tif','slp.tif','apt.tif'] #List of endings for each folder type 
+    
+    for i in range(0,4): #Loops through four times
+        folderpath = path + "\\" + folder[i] + "\\" + filename[:3] + endings[i] #output folder is equal to the lidar tiles folder 
+        create_tif(folderpath, input_functions[i], rows, cols)                  #plus the folder we are iterating through, plus
+                                                                                #the filename minus the last 4 characters, plus
+                                                                                #the file ending. 
     outdata = None #important to close the files
     band = None
-    ds = None  
+    ds = None 
     
-    
-    #Below is a potential way to add each function to appropriate geodatabase 
-    #for i in xrange(10):
-       #with open('file_{0}.dat'.format(i),'w') as f:
-          #f.write(str(func(i)))
-
-
-print(hillshade45array)
