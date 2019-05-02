@@ -4,7 +4,7 @@ import rasterio
 import numpy as np
 import matplotlib.pyplot as plt
 import gdal 
-
+#TESTING 
 
 file = "Downloads/MN_lidar_tile_-120-114_dem.tif" #Locates file
 lidar_tile_120 = rasterio.open(file) #Opens file
