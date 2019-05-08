@@ -1,4 +1,5 @@
-# mn-landslide-susceptibility-
-University of Minnesota student project from GEOG 5541 Principles of Geocomputing to measure landslide susceptibility using lidar-derived DEM.
+# ArcPy Script for Hillshade, Slope, and Aspect
+The deliverable for this project is an ArcGIS Pro tool, packaged as a GPKX file that can be accessed using ArcGIS Pro. The Tool, “Hillshade, Slope, and Aspect: Multivalue input”, creates three outputs for each input surface raster. The tool will accept multiple raster files and output three raster products (hillshade, slope, and aspect) for each input. Usage and utility of the tool will be discussed in a later section
 
-The program takes DEM as input and outputs four datasets: two hillshades, slope, and aspect.
+This tool can be used to provide a quantitative measure of landslide susceptibility by performing four analyses of slope stability.  The most important measures to assess landslide susceptibility and slope stability are hillshade (45* and 315* azimuth to deal with shadowing), aspect, and slope.  This tool was created to speed up the process of this analysis. Consider building this tool into ModelBuilder. If you have a lidar data source that will be tiled into rasters of the same coordinate system and resolution, you could do the preprocessing and slope stability analysis in ModelBuilder with the addition of this tool. 
+
